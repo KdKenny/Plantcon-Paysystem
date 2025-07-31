@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Dashboard</h2>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Pending Payments</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ pending_payments_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Total Received</div>
+                <div class="card-body">
+                    <h4 class="card-title">${{ total_paid|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Pending This Month</div>
+                <div class="card-body">
+                    <h4 class="card-title">${{ pending_this_month_amount|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Total Deducted</div>
+                <div class="card-body">
+                    <h4 class="card-title">${{ total_deducted|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<hr>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>All Invoices</h3>
+    <div>
+        <a href="{% url 'statement:export_payments_csv' %}" class="btn btn-success">Export Payments to CSV</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Import Payments from CSV
+    </div>
+    <div class="card-body">
+        <form action="{% url 'statement:import_payments_csv' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="file" class="form-control" name="csv_file" accept=".csv" required>
+                <button class="btn btn-primary" type="submit">Import</button>
+            </div>
+            <small class="form-text text-muted">
+                Please ensure the CSV format matches the exported file, including the header. The first column must be the Payment ID for updating existing records.
+            </small>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+                <th>Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Monthly Amount</th>
+                <th>Total Received</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td><a href="{% url 'statement:invoice_detail' invoice.id %}">{{ invoice.name }}</a></td>
+                <td>{{ invoice.start_date }}</td>
+                <td>{{ invoice.end_date }}</td>
+                <td>${{ invoice.monthly_amount|floatformat:2 }}</td>
+                <td>${{ invoice.total_received_amount|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'addinvoice:edit_invoice' invoice.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

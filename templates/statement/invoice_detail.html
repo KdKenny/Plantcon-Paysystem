@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Invoice Details: {{ invoice.name }}</h2>
+    <hr>
+    <h4>Summary</h4>
+    <p><strong>Start Date:</strong> {{ invoice.start_date }}</p>
+    <p><strong>End Date:</strong> {{ invoice.end_date }}</p>
+    <p><strong>Monthly Amount:</strong> ${{ invoice.monthly_amount|floatformat:2 }}</p>
+    <p><strong>Deduction Recipient:</strong> {{ invoice.deduction_recipient }}</p>
+    <p><strong>Deduction Periods:</strong> {{ invoice.deduction_periods }}</p>
+    
+    <h4 class="mt-5">Payment History</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Amount Received</th>
+                <th>Processed Date</th>
+                <th>Deducted</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.due_date }}</td>
+                <td>
+                    {% if payment.processed %}
+                        <span class="badge badge-success">Processed</span>
+                    {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if payment.is_deducted %}
+                        $0.00
+                    {% else %}
+                        ${{ payment.amount_received|floatformat:2 }}
+                    {% endif %}
+                </td>
+                <td>{{ payment.processed_date|default:"N/A" }}</td>
+                <td>
+                    {% if payment.is_deducted %}
+                        <span class="text-danger">- ${{ payment.amount_received|floatformat:2 }}</span>
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'statement:toggle_deducted' payment.id %}" class="btn btn-sm {% if payment.is_deducted %}btn-danger{% else %}btn-outline-secondary{% endif %}">
+                        {% if payment.is_deducted %}
+                            Mark as Not Deducted
+                        {% else %}
+                            Mark as Deducted
+                        {% endif %}
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'statement:dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}
