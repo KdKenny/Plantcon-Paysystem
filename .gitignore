@@ -136,12 +136,32 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.production
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Deployment specific
+logs/
+task-definition.json
+*.pem
+*.key
+
+# Terraform
+deploy/*.tfstate
+deploy/*.tfstate.*
+deploy/.terraform/
+deploy/.terraform.lock.hcl
+
+# AWS
+.aws/
+
+# Static files for production
+staticfiles/
 
 # Spyder project settings
 .spyderproject

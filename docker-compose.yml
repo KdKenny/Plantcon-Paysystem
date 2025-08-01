@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: plantcon
+      POSTGRES_USER: plantcon_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DJANGO_ENVIRONMENT=production
+      - RDS_DB_NAME=plantcon
+      - RDS_USERNAME=plantcon_user
+      - RDS_PASSWORD=${DB_PASSWORD}
+      - RDS_HOSTNAME=db
+      - RDS_PORT=5432
+      - SITE_SECRET_KEY=${SITE_SECRET_KEY}
+      - DJANGO_ALLOWED_HOST=localhost
+    volumes:
+      - ./logs:/var/log/plantcon
+
+volumes:
+  postgres_data:
